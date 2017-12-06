@@ -2,6 +2,7 @@
 #include <vector>
 #include <limits>
 #include <numeric>
+#include <cmath>
 
 using namespace std;
 
@@ -20,6 +21,7 @@ void PID::Init(double Kp, double Ki, double Kd, double twiddle_tol) {
   twiddle_cnt = 0;
   twiddle_second_pass = false;
   twiddle_param_index = 0;
+  twiddle_total_err = 0;
   twiddle_best_err = numeric_limits<double>::max();
   this->Kp = Kp;
   this->Ki = Ki;
@@ -32,22 +34,24 @@ void PID::Init(double Kp, double Ki, double Kd, double twiddle_tol) {
 void PID::Twiddle(unsigned long int n) {
   // n is the number of iterations that must be passed before the coefficients are modified
   vector<double *> coefficients = {&Kp, &Ki, &Kd};
-  double err = TotalError();
+  twiddle_total_err += pow(p_error, 2);
   if (++twiddle_cnt >= n) {
+    twiddle_total_err /= n;
     if (accumulate(twiddle_dp.begin(), twiddle_dp.end(), 0) > twiddle_tol) {
       if (!twiddle_second_pass) {
         *coefficients[twiddle_param_index] += twiddle_dp[twiddle_param_index];
-        if (err < twiddle_best_err) {
-          twiddle_best_err = err;
+        if (twiddle_total_err < twiddle_best_err) {
+          twiddle_best_err = twiddle_total_err;
           twiddle_dp[twiddle_param_index] *= 1.1;
           twiddle_param_index++;
+          twiddle_total_err = 0;
         } else {
           twiddle_second_pass = true;
         }
       } else {
         *coefficients[twiddle_param_index] -= twiddle_dp[twiddle_param_index] * 2;
-        if (err < twiddle_best_err) {
-          twiddle_best_err = err;
+        if (twiddle_total_err < twiddle_best_err) {
+          twiddle_best_err = twiddle_total_err;
           twiddle_dp[twiddle_param_index] *= 1.1;
           twiddle_param_index++;
         } else {
@@ -56,7 +60,10 @@ void PID::Twiddle(unsigned long int n) {
         }
         twiddle_second_pass = false;
         twiddle_param_index++;
+        twiddle_total_err = 0;
       }
+    } else {
+      twiddle_done = true;
     }
   }
   twiddle_param_index %= coefficients.size();

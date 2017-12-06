@@ -15,6 +15,7 @@ public:
   /*
   * Twiddle-dee! Twiddle-dum!
   */
+  double twiddle_total_err;
   double twiddle_best_err;
   double twiddle_tol;
   std::vector<double> twiddle_dp;
