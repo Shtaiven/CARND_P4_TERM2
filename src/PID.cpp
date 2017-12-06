@@ -53,7 +53,6 @@ void PID::Twiddle(unsigned long int n) {
         if (twiddle_total_err < twiddle_best_err) {
           twiddle_best_err = twiddle_total_err;
           twiddle_dp[twiddle_param_index] *= 1.1;
-          twiddle_param_index++;
         } else {
           *coefficients[twiddle_param_index] += twiddle_dp[twiddle_param_index];
           twiddle_dp[twiddle_param_index] *= 0.9;
