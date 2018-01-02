@@ -37,7 +37,6 @@ int main()
 
   PID pid;
 
-  // TODO: Tune these
   // Constant params
   double Kp = 0.4;
   double Ki = 0.03;
@@ -69,7 +68,7 @@ int main()
           double angle = std::stod(j[1]["steering_angle"].get<std::string>());
           double steer_value;
           /*
-          * TODO: Calcuate steering value here, remember the steering value is
+          * Calcuate steering value here, remember the steering value is
           * [-1, 1].
           * NOTE: Feel free to play around with the throttle and speed. Maybe use
           * another PID controller to control the speed!
