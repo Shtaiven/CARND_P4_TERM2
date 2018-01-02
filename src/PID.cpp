@@ -18,7 +18,7 @@ PID::~PID() {}
 
 void PID::Init(double Kp, double Ki, double Kd, bool twiddle_enable, double twiddle_tol, int twiddle_n, double twiddle_multiplier) {
   // twiddle init
-  twiddle_dp = {1.0, 0.001, 0.1};
+  twiddle_dp = {0.1, 0.01, 0.01};  // TODO: Tune these
   this->twiddle_enable = twiddle_enable;
   this->twiddle_tol = twiddle_tol;
   this->twiddle_n = twiddle_n;
@@ -40,13 +40,13 @@ void PID::Init(double Kp, double Ki, double Kd, bool twiddle_enable, double twid
 }
 
 void PID::UpdateError(double cte) {
-  double time_delta = (clock() - prev_ticks) / CLOCKS_PER_SEC;  // in seconds
+  double time_delta = (double) (clock() - prev_ticks) / CLOCKS_PER_SEC;  // in seconds
   cout << "dt: " << time_delta
        << "    t_prev: " << prev_ticks
        << "    twiddle_n: " << twiddle_n_index
        << "    twiddle_param: " << twiddle_param_index
        << "    twiddle_state: " << twiddle_state
-       << "    sum: " << accumulate(twiddle_dp.begin(), twiddle_dp.end(), 0.0) << endl;
+       << "    twiddle_sum: " << accumulate(twiddle_dp.begin(), twiddle_dp.end(), 0.0) << endl;
 
   if (twiddle_enable) {
     vector<double *> twiddle_p = {&Kp, &Ki, &Kd};
@@ -100,7 +100,7 @@ void PID::UpdateError(double cte) {
 }
 
 double PID::TotalError() {
-  printf("p[%f, %f, %f]\terr[%f, %f, %f]\n", Kp, Ki, Kd, p_error, i_error, d_error);
+  printf("K[%f, %f, %f]    err[%f, %f, %f]\n", Kp, Ki, Kd, p_error, i_error, d_error);
   return (double) -Kp * p_error - Ki * i_error - Kd * d_error;
 }
 

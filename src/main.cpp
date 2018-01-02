@@ -38,12 +38,14 @@ int main()
   PID pid;
 
   // TODO: Tune these
-  // Meta params
-  double Kp = 0.0;
-  double Ki = 0.0;
-  double Kd = 0.0;
-  bool twiddle_enable = true;
-  double twiddle_tol = 0.002;
+  // Constant params
+  double Kp = 0.4;
+  double Ki = 0.03;
+  double Kd = 0.01;
+
+  // Twiddle params
+  bool twiddle_enable = false;
+  double twiddle_tol = 0.02;
   int twiddle_n = 20;
   double twiddle_multiplier = 0.5;
 
@@ -73,13 +75,15 @@ int main()
           * another PID controller to control the speed!
           */
           std::cout << "\nIteration: " << iter++ << std::endl;
+          std::cout << "CTE: " << cte << std::endl;
+          
           pid.UpdateError(cte);
           steer_value = pid.TotalError();
-          std::cout << "CTE: " << cte << std::endl;
+          steer_value = std::max(std::min(steer_value, 1.0), -1.0);  // clamp to [-1, 1]
 
           json msgJson;
           msgJson["steering_angle"] = steer_value;
-          msgJson["throttle"] = 0.2;
+          msgJson["throttle"] = 0.3;
           auto msg = "42[\"steer\"," + msgJson.dump() + "]";
           std::cout << msg << std::endl;
           ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
