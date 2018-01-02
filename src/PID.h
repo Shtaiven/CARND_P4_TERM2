@@ -2,6 +2,7 @@
 #define PID_H
 
 #include <vector>
+#include <ctime>
 
 class PID {
 public:
@@ -15,14 +16,18 @@ public:
   /*
   * Twiddle-dee! Twiddle-dum!
   */
-  double twiddle_total_err;
+  bool twiddle_enable;
   double twiddle_best_err;
   double twiddle_tol;
+  double twiddle_multiplier;
   std::vector<double> twiddle_dp;
-  unsigned long int twiddle_cnt;
-  bool twiddle_done;
-  bool twiddle_second_pass;
+  enum twiddle_states {ADD_PD, FIRST_PASS, SECOND_PASS, DONE};
+  int twiddle_state;
   int twiddle_param_index;
+  int twiddle_n;
+  int twiddle_n_index;
+  clock_t prev_ticks;
+
   /*
   * Coefficients
   */ 
@@ -43,12 +48,7 @@ public:
   /*
   * Initialize PID.
   */
-  void Init(double Kp, double Ki, double Kd, double twiddle_tol=0.2);
-
-  /*
-  * Twiddle-dee! Twiddle-dum!
-  */
-  void Twiddle(unsigned long int n);
+  void Init(double Kp, double Ki, double Kd, bool twiddle_enable=false, double twiddle_tol=0.2, int twiddle_n = 100, double twiddle_multiplier=0.1);
 
   /*
   * Update the PID error variables given cross track error.
