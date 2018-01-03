@@ -8,17 +8,13 @@
 
 using namespace std;
 
-/*
-* TODO: Complete the PID class.
-*/
-
 PID::PID() {}
 
 PID::~PID() {}
 
 void PID::Init(double Kp, double Ki, double Kd, bool twiddle_enable, double twiddle_tol, int twiddle_n, double twiddle_multiplier) {
   // twiddle init
-  twiddle_dp = {0.1, 0.01, 0.01};  // TODO: Tune these
+  twiddle_dp = {0.1, 0.01, 0.01};
   this->twiddle_enable = twiddle_enable;
   this->twiddle_tol = twiddle_tol;
   this->twiddle_n = twiddle_n;
